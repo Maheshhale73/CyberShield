@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alerts</title>
+    <link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div style="margin-bottom:20px;">
+
+    <a href="/clear-alerts">
+
+        <button class="danger-btn">
+            Clear Alerts
+        </button>
+
+    </a>
+
+</div>
+
+<h1>Security Alerts</h1>
+<div class="search-box">
+
+    <input
+        type="text"
+        id="alertSearch"
+        placeholder="Search by IP, Attack Type, Severity..."
+    >
+
+</div>
+
+<br>
+
+<table border="1">
+
+<tr>
+
+    <th>Attack Type</th>
+    <th>IP Address</th>
+    <th>Severity</th>
+    <th>Message</th>
+    <th>Timestamp</th>
+    <th>Failed Attempts</th>
+    <th>Action</th>
+    <th>Status</th>
+    
+
+</tr>
+
+{% for alert in alerts %}
+
+<tr>
+
+    <td>{{ alert.attack_type }}</td>
+
+    <td>{{ alert.attacker_ip }}</td>
+
+    <td>
+
+    {% if alert.severity == "Critical" %}
+
+    <span class="critical-badge">
+
+        Critical
+
+    </span>
+
+    {% elif alert.severity == "High" %}
+
+    <span class="high-badge">
+
+        High
+
+    </span>
+
+    {% else %}
+
+    <span class="medium-badge">
+
+        Medium
+
+    </span>
+
+    {% endif %}
+
+</td>
+
+    <td>{{ alert.message }}</td>
+
+    <td>{{ alert.created_at }}</td>
+
+    <td>{{ alert.failed_attempts }}</td>
+
+   <td>
+
+    <form action="/block-ip" method="POST">
+
+        <input
+            type="hidden"
+            name="ip"
+            value="{{ alert.attacker_ip }}"
+        >
+
+        <button class="block-btn">
+
+            Block IP
+
+        </button>
+
+    </form>
+
+    <br>
+
+    <a href="/generate-single-report/{{ alert.id }}">
+
+        <button class="generate-btn">
+
+            Generate Report
+
+        </button>
+
+    </a>
+
+    <br><br>
+
+    <a
+    href="/resolve-alert/{{ alert.id }}"
+    class="resolve-btn">
+
+        Resolve
+
+    </a>
+
+</td>
+
+<td>
+
+    {% if alert.status == "Open" %}
+
+    <span class="status-open">
+        Open
+    </span>
+
+    {% elif alert.status == "Investigating" %}
+
+    <span class="status-investigating">
+        Investigating
+    </span>
+
+    {% else %}
+
+    <span class="status-resolved">
+        Resolved
+    </span>
+
+    {% endif %}
+
+</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<script>
+
+const searchInput = document.getElementById("alertSearch");
+
+searchInput.addEventListener("keyup", function(){
+
+    const value = this.value.toLowerCase();
+
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+
+        const rowText = row.innerText.toLowerCase();
+
+        if(rowText.includes(value)){
+
+            row.style.display = "";
+
+        }
+
+        else{
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+});
+
+</script>
+</body>
+</html>

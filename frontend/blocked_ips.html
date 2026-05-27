@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blocked IPs</title>
+    <link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div style="margin-bottom:20px;">
+
+    <a href="/clear-blocked-ips">
+
+        <button class="danger-btn">
+            Clear Blocked IPs
+        </button>
+
+    </a>
+
+</div>
+
+<h1>Blocked IP Addresses</h1>
+
+<table border="1">
+<tr>
+    <th>IP Address</th>
+    <th>Reason</th>
+    <th>Blocked At</th>
+</tr>
+
+{% for ip in ips %}
+<tr>
+    <td>{{ ip.ip_address }}</td>
+    <td>{{ ip.reason }}</td>
+    <td>{{ ip.blocked_at }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>

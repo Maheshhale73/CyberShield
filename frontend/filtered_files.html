@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Filtered Files</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="main-content">
+
+    <div class="table-box">
+
+        <div class="table-header">
+
+            <h2>{{ status }} Files</h2>
+
+        </div>
+
+        <div class="table-container">
+
+            <table>
+
+                <tr>
+
+                    <th>File Name</th>
+
+                    <th>Status</th>
+
+                    <th>Path</th>
+
+                    <th>Timestamp</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+                {% for file in files %}
+
+                <tr>
+
+                    <td>
+                        {{ file.file_name }}
+                    </td>
+
+                    <td>
+
+                        {% if file.status == "Secure" %}
+
+                        <span class="badge green-bg">
+                            Secure
+                        </span>
+
+                        {% elif file.status == "Modified" %}
+
+                        <span class="badge yellow-bg">
+                            Modified
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge red-bg">
+                            Missing
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+                        {{ file.file_path }}
+                    </td>
+
+                    <td>
+                        {{ file.uploaded_at }}
+                    </td>
+
+                    <td>
+
+                        <a href="/uploads/{{ file.file_name }}"
+                        target="_blank"
+                        class="btn">
+
+                            View File
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

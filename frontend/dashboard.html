@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>CyberShield Dashboard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+</script>
+</head>
+
+<body>
+
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <div>
+
+            <div class="logo">
+
+                <div class="logo-box">
+                
+                </div>
+
+                <h2>CyberShield</h2>
+
+                <p>THREAT MONITORING PLATFORM</p>
+
+            </div>
+
+            <div class="menu">
+
+                <a href="/dashboard" class="active">
+                    Dashboard
+                </a>
+
+                <a href="/alerts" class="sidebar-link">
+
+    Alerts
+
+    {% if alert_count > 0 %}
+
+    <span class="alert-badge">
+
+        {{ alert_count }}
+
+    </span>
+
+    {% endif %}
+
+</a>
+
+                <a href="/reports">
+                    Reports
+                </a>
+
+                <a href="/blocked-ips">
+                    Blocked IPs
+                </a>
+
+                <a href="/logs">
+                    Logs
+                </a>
+
+                {% if session.role == "SuperAdmin" %}
+
+                <a href="/admin-management">
+                    User Management
+                </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <div class="status">
+            ● Monitoring Active
+        </div>
+
+    </div>
+
+    <!-- MAIN CONTENT -->
+
+    <div class="main-content">
+
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h1>Security Dashboard</h1>
+
+                <p>
+                    Current User IP:
+                    <strong>{{ request.remote_addr }}</strong>
+                </p>
+
+                <p>
+                    Last Upload:
+                    {{ files[0].uploaded_at if files else "No Upload Yet" }}
+                </p>
+
+            </div>
+
+            <div class="top-buttons">
+
+                <!-- FILE UPLOAD -->
+
+                <form
+                action="/upload"
+                method="POST"
+                enctype="multipart/form-data"
+                class="upload-form">
+
+                    <input
+                    type="file"
+                    name="file"
+                    required>
+
+                    <button type="submit" class="btn upload-btn">
+                        Upload File
+                    </button>
+
+                </form>
+
+                <!-- MONITOR BUTTON -->
+
+                <a href="/monitor" class="btn monitor-btn">
+                    Start Monitoring
+                </a>
+
+                <!-- ALERT BUTTON -->
+
+                <a href="/alerts" class="btn alert-btn">
+                    View Alerts
+                </a>
+
+                <!-- LOGOUT -->
+
+                <a href="/logout" class="btn logout-btn">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- STATS -->
+
+        <div class="stats-grid">
+
+            <!-- SECURE -->
+
+            <a href="/files/Secure" class="card-link">
+
+                <div class="card">
+
+                    <h3>SECURE FILES</h3>
+
+                    <h2 class="green">
+                        {{ secure_count }}
+                    </h2>
+
+                    <p>Integrity Verified</p>
+
+                </div>
+
+            </a>
+
+            <!-- MODIFIED -->
+
+            <a href="/files/Modified" class="card-link">
+
+                <div class="card">
+
+                    <h3>MODIFIED FILES</h3>
+
+                    <h2 class="yellow">
+                        {{ modified_count }}
+                    </h2>
+
+                    <p>Possible Tampering</p>
+
+                </div>
+
+            </a>
+
+            <!-- MISSING -->
+
+            <a href="/files/Missing" class="card-link">
+
+                <div class="card">
+
+                    <h3>MISSING FILES</h3>
+
+                    <h2 class="red">
+                        {{ missing_count }}
+                    </h2>
+
+                    <p>Deleted or Missing</p>
+
+                </div>
+
+            </a>
+
+            <!-- TOTAL -->
+
+            <a href="/files/all" class="card-link">
+
+                <div class="card">
+
+                    <h3>TOTAL FILES</h3>
+
+                    <h2 class="cyan">
+                        {{ total_files }}
+                    </h2>
+
+                    <p>Currently Monitored</p>
+
+                    <h3>
+                        Welcome,
+                        {{ session.admin_name }}
+                    </h3>
+
+                    <p>
+                        Role:
+                        {{ session.role }}
+                    </p>
+
+                </div>
+
+            </a>
+
+        </div>
+
+        <!-- THREAT ANALYTICS CHART -->
+
+<div class="chart-box">
+
+    <h2 class="chart-title">
+
+        Threat Analytics
+
+    </h2>
+
+    <div class="chart-container">
+
+        <canvas id="threatChart"></canvas>
+
+    </div>
+
+</div>
+
+
+        <!-- FILE TABLE -->
+
+        <div class="table-box">
+
+            <div class="table-header">
+
+                <h2>Monitored Files</h2>
+
+            </div>
+
+            <!-- SCROLLABLE TABLE -->
+
+            <div class="table-container">
+
+                <table>
+
+                    <tr>
+
+                        <th>File Name</th>
+
+                        <th>Path</th>
+
+                        <th>Status</th>
+
+                        <th>Hash</th>
+
+                        <th>Actions</th>
+
+                        <th>Timestamp</th>
+
+                    </tr>
+
+                    {% for file in files %}
+
+                    <tr>
+
+                        <!-- FILE NAME -->
+
+                        <td>
+
+                            {{ file.file_name }}
+
+                        </td>
+
+                        <!-- FILE PATH -->
+
+                        <td>
+
+                            {{ file.file_path }}
+
+                        </td>
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if file.status == "Secure" %}
+
+                            <span class="badge green-bg">
+
+                                Secure
+
+                            </span>
+
+                            {% elif file.status == "Modified" %}
+
+                            <span class="badge yellow-bg">
+
+                                Modified
+
+                            </span>
+
+                            {% else %}
+
+                            <span class="badge red-bg">
+
+                                Missing
+
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- HASH -->
+
+                        <td>
+
+                            {{ file.hash_value[:18] }}...
+
+                        </td>
+
+                        <!-- ACTION -->
+
+                        <td>
+
+                            <a href="/uploads/{{ file.file_name }}"
+                            target="_blank"
+                            class="btn">
+
+                                View File
+
+                            </a>
+
+                            <a href="/hash-details/{{ file.id }}" class="btn">
+                                Compare Hash
+
+                        <!-- TIMESTAMP -->
+
+                        <td>
+
+                            {{ file.uploaded_at }}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const ctx =
+document.getElementById('threatChart');
+
+new Chart(ctx, {
+
+    type: 'doughnut',
+
+    data: {
+
+        labels: [
+
+            'Secure Files',
+
+            'Modified Files',
+
+            'Missing Files'
+
+        ],
+
+        datasets: [{
+
+            data: [
+
+               Number("{{ secure_count }}"),
+
+                Number("{{ modified_count }}"),
+
+                Number("{{ missing_count }}")
+
+            ],
+
+            backgroundColor: [
+
+                '#22c55e',
+
+                '#facc15',
+
+                '#ef4444'
+
+            ]
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio:false,
+        cutout:'65%',
+
+    radius:'80%',
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+
+                    color: 'white',
+
+                    font: {
+
+                        size: 14
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+<script>
+
+var socket = io();
+
+socket.on('new_alert', function(data){
+
+    alert(data.message);
+
+});
+
+</script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+<script>
+
+const socket = io();
+
+socket.on('new_alert', function(data){
+
+    alert("⚠ " + data.message);
+
+    location.reload();
+
+});
+
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>System Logs</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <div style="margin-bottom:20px;">
+
+    <a href="/clear-logs">
+
+        <button class="danger-btn">
+            Clear Logs
+        </button>
+
+    </a>
+
+</div>
+
+<div class="main-content">
+
+    <h1>System Activity Logs</h1>
+
+    <br>
+
+    <div class="table-box">
+
+        <table>
+
+            <tr>
+
+                <th>Activity</th>
+
+                <th>IP Address</th>
+
+                <th>Time</th>
+
+            </tr>
+
+            {% for log in logs %}
+
+            <tr>
+
+                <td>{{ log.activity }}</td>
+
+                <td>{{ log.ip_address }}</td>
+
+                <td>{{ log.created_at }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Hash Comparison</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="main-content">
+
+    <div class="table-box">
+
+        <div class="table-header">
+
+            <h2>Hash Comparison</h2>
+
+        </div>
+
+        <div style="padding:30px;">
+
+            <h3>
+                File:
+                {{ file.file_name }}
+            </h3>
+
+            <br>
+
+            <h3 style="color:#22c55e;">
+                OLD HASH
+            </h3>
+
+            <div class="hash-box">
+
+                {{ file.hash_value }}
+
+            </div>
+
+            <br><br>
+
+            <h3 style="color:#ef4444;">
+                NEW HASH
+            </h3>
+
+            <div class="hash-box">
+
+                {{ file.current_hash }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

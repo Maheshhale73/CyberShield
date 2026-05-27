@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>User Management</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+
+body{
+    background:#050816;
+    color:white;
+    font-family:Arial;
+}
+
+.main{
+    padding:30px;
+}
+
+.title{
+    font-size:35px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#aaa;
+    margin-bottom:30px;
+}
+
+.card{
+    background:#0b1220;
+    border:1px solid #1e293b;
+    padding:25px;
+    border-radius:12px;
+    margin-bottom:30px;
+}
+
+input,
+select{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    margin-bottom:20px;
+    background:#111827;
+    border:1px solid #334155;
+    color:white;
+    border-radius:8px;
+}
+
+button{
+    background:#06b6d4;
+    color:black;
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+table th{
+    background:#111827;
+    padding:15px;
+    text-align:left;
+}
+
+table td{
+    padding:15px;
+    border-bottom:1px solid #1e293b;
+}
+
+.badge-admin{
+    background:#0ea5e9;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.badge-super{
+    background:#22c55e;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+    padding:8px 15px;
+    border-radius:8px;
+    text-decoration:none;
+}
+
+.delete-btn:hover{
+    opacity:0.8;
+}
+
+.back-btn{
+    display:inline-block;
+    margin-top:20px;
+    background:#334155;
+    color:white;
+    padding:10px 20px;
+    border-radius:8px;
+    text-decoration:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+    <div class="title">
+        User Management Panel
+    </div>
+
+    <div class="subtitle">
+        Manage administrators and system access
+    </div>
+
+    <!-- ADD ADMIN -->
+
+    <div class="card">
+
+        <h2>Add New Admin</h2>
+
+        <form method="POST"
+        action="/add-admin">
+
+            <input
+            type="text"
+            name="username"
+            placeholder="Enter Username"
+            required>
+
+            <input
+            type="password"
+            name="password"
+            placeholder="Enter Password"
+            required>
+
+            <select name="role">
+
+                <option value="Admin">
+                    Admin
+                </option>
+
+                <option value="SuperAdmin">
+                    SuperAdmin
+                </option>
+
+            </select>
+
+            <button type="submit">
+                Add Admin
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- ADMIN TABLE -->
+
+    <!-- ADMIN CARDS -->
+
+<div class="card">
+
+    <h2>System Administrators</h2>
+
+    <div class="admin-grid">
+
+        {% for admin in admins %}
+
+        <div class="admin-card">
+
+            <!-- TOP -->
+
+            <div class="admin-top">
+
+                <div class="admin-avatar">
+
+                    {{ admin.username[0].upper() if admin.username else 'A' }}
+
+                </div>
+
+                <div>
+
+                    <div class="admin-name">
+
+                        {{ admin.username }}
+
+                    </div>
+
+                    <div class="admin-role">
+
+                        {{ admin.role }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- INFO -->
+
+            <div class="admin-info">
+
+                <p>
+
+                    <span>IP Address:</span>
+
+                    {{ admin.last_login_ip if admin.last_login_ip else 'No IP Found' }}
+
+                </p>
+
+                <p>
+
+                    <span>Device:</span>
+
+                    {{ admin.device_info[:35] if admin.device_info else 'Unknown Device' }}
+
+                </p>
+
+                <p>
+
+                    <span>Last Login:</span>
+
+                    {{ admin.last_login if admin.last_login else 'Never Logged In' }}
+
+                </p>
+
+            </div>
+
+            <!-- ACTIONS -->
+
+            <div class="admin-actions">
+
+                {% if admin.username != session.admin_name %}
+
+                <a
+                href="/delete-admin/{{ admin.id }}"
+                class="delete-btn">
+
+                    Delete Admin
+
+                </a>
+
+                {% else %}
+
+                <div class="protected">
+
+                    Protected Account
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+    <a href="/dashboard"
+    class="back-btn">
+
+        Back To Dashboard
+
+    </a>
+
+</div>
+
+</body>
+</html>

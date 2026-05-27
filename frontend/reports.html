@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Reports</title>
+    <link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <div style="margin-bottom:20px;">
+
+    <a href="/clear-reports">
+
+        <button class="danger-btn">
+            Clear Reports
+        </button>
+
+    </a>
+
+    <a href="/generate-report">
+
+    <button class="generate-btn">
+
+        Generate Report
+
+    </button>
+
+</a>
+
+<a href="/download-report-pdf">
+
+    <button class="generate-btn">
+
+        Download PDF
+
+    </button>
+
+</a>
+
+<a href="/download-report-doc">
+
+    <button class="generate-btn">
+
+        Download DOC
+
+    </button>
+
+</a>
+
+</div>
+
+<h1>Reports</h1>
+
+<table border="1">
+
+<tr>
+
+    <th>Status</th>
+
+    <th>Details</th>
+
+</tr>
+
+{% for report in reports %}
+
+<tr>
+
+    <td>{{ report.status }}</td>
+
+    <td>{{ report.details }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>
