@@ -1,14 +1,14 @@
 import mysql.connector
 
 conn = mysql.connector.connect(
-
+    
     host="localhost",
 
     user="root",
 
     password="",
 
-    database="fim_system"
+    database="fim_system",
 )
 
 cursor = conn.cursor(
