@@ -26,6 +26,7 @@ href="{{ url_for('static', filename='css/style.css') }}">
     <th>IP Address</th>
     <th>Reason</th>
     <th>Blocked At</th>
+    <th>Action</th>
 </tr>
 
 {% for ip in ips %}
@@ -33,6 +34,21 @@ href="{{ url_for('static', filename='css/style.css') }}">
     <td>{{ ip.ip_address }}</td>
     <td>{{ ip.reason }}</td>
     <td>{{ ip.blocked_at }}</td>
+    <td>
+
+{% if session.role == "SuperAdmin" %}
+
+<a href="/unblock-ip/{{ ip.id }}"
+   class="btn"
+   onclick="return confirm('Are you sure you want to unblock this IP?')">
+
+   Unblock
+
+</a>
+
+{% endif %}
+
+</td>
 </tr>
 {% endfor %}
 

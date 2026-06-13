@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>My Profile</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="main-content">
+
+        <div class="table-box">
+
+            <div class="table-header">
+                <h2>My Profile</h2>
+            </div>
+
+            <table>
+
+                <tr>
+                    <th>Username</th>
+                    <td>{{ admin.username }}</td>
+                </tr>
+
+                <tr>
+                    <th>Role</th>
+                    <td>{{ admin.role }}</td>
+                </tr>
+
+                <tr>
+                    <th>Admin ID</th>
+                    <td>{{ admin.id }}</td>
+                </tr>
+
+                <tr>
+                    <th>Last Login</th>
+                    <td>{{ admin.last_login }}</td>
+                </tr>
+
+                <tr>
+                    <th>Last Login IP</th>
+                    <td>{{ admin.last_login_ip }}</td>
+                </tr>
+
+                <tr>
+                    <th>Device Info</th>
+                    <td>{{ admin.device_info }}</td>
+                </tr>
+
+                <tr>
+                    <th>Created Date</th>
+                    <td>{{ admin.created_at }}</td>
+                </tr>
+
+            </table>
+
+            <br>
+
+            <a href="/dashboard" class="btn">
+                Back To Dashboard
+            </a>
+
+            <a href="/change-password" class="btn">
+                Change Password
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

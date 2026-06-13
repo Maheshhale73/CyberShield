@@ -75,6 +75,10 @@ href="{{ url_for('static', filename='css/style.css') }}">
                     Logs
                 </a>
 
+                <a href="/profile">
+                    Profile
+                </a>
+
                 {% if session.role == "SuperAdmin" %}
 
                 <a href="/admin-management">

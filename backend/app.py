@@ -161,12 +161,6 @@ def home():
 
     return redirect(url_for('login'))
 
-
-
-# ======================================================
-# LOGIN MODULE
-# ======================================================
-
 # ======================================================
 # LOGIN MODULE
 # ======================================================
@@ -1100,6 +1094,38 @@ def block_ip():
     return redirect("/blocked-ips")
 
 
+
+@app.route('/unblock-ip/<int:id>')
+def unblock_ip(id):
+
+    if session.get('role') != 'SuperAdmin':
+        return "Access Denied"
+
+    cursor.execute("""
+        SELECT *
+        FROM blocked_ips
+        WHERE id=%s
+    """, (id,))
+
+    blocked_ip = cursor.fetchone()
+
+    if not blocked_ip:
+        return redirect('/blocked-ips')
+
+    cursor.execute("""
+        DELETE FROM blocked_ips
+        WHERE id=%s
+    """, (id,))
+
+    conn.commit()
+
+    add_log(
+        f"IP Unblocked: {blocked_ip['ip_address']}"
+    )
+
+    return redirect('/blocked-ips')
+
+
 # ======================================================
 # LOGS PAGE
 # ======================================================
@@ -1535,6 +1561,122 @@ Time: {datetime.now()}
         "status": "success",
         "message": "Alert Received"
     }
+
+
+@app.route('/profile')
+def profile():
+
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('login'))
+
+    cursor.execute("""
+        SELECT *
+        FROM admin_users
+        WHERE username=%s
+    """, (session['admin_name'],))
+
+    admin = cursor.fetchone()
+
+    return render_template(
+        'profile.html',
+        admin=admin
+    )
+
+
+@app.route('/change-password', methods=['GET', 'POST'])
+def change_password():
+
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if new_password != confirm_password:
+            return render_template(
+                'change_password.html',
+                error="Passwords do not match"
+            )
+
+        cursor.execute("""
+            SELECT *
+            FROM admin_users
+            WHERE username=%s
+        """, (session['admin_name'],))
+
+        admin = cursor.fetchone()
+
+        if not bcrypt.checkpw(
+            current_password.encode('utf-8'),
+            admin['password'].encode('utf-8')
+        ):
+            return render_template(
+                'change_password.html',
+                error="Current Password Incorrect"
+            )
+
+        hashed_password = bcrypt.hashpw(
+            new_password.encode('utf-8'),
+            bcrypt.gensalt()
+        ).decode('utf-8')
+
+        cursor.execute("""
+            UPDATE admin_users
+            SET password=%s
+            WHERE id=%s
+        """, (
+            hashed_password,
+            admin['id']
+        ))
+
+        conn.commit()
+
+        add_log(
+            f"{admin['username']} Changed Password"
+        )
+
+        return render_template(
+            'change_password.html',
+            success="Password Changed Successfully"
+        )
+
+    return render_template('change_password.html')
+
+
+@app.route('/reset-password/<int:id>')
+def reset_password(id):
+
+    if session.get('role') != 'SuperAdmin':
+        return "Access Denied"
+
+    new_password = "admin@123"
+
+    hashed_password = bcrypt.hashpw(
+        new_password.encode('utf-8'),
+        bcrypt.gensalt()
+    ).decode('utf-8')
+
+    cursor.execute("""
+        UPDATE admin_users
+        SET password=%s
+        WHERE id=%s
+    """, (
+        hashed_password,
+        id
+    ))
+
+    conn.commit()
+
+    add_log(
+        f"Password Reset For Admin ID {id}"
+    )
+
+    return redirect('/admin-management')
+
+    
 # ======================================================
 # MAIN
 # ======================================================

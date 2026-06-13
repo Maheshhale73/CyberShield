@@ -122,6 +122,111 @@ table td{
     text-decoration:none;
 }
 
+.admin-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(350px,1fr));
+    gap:20px;
+    margin-top:20px;
+}
+
+.admin-card{
+    background:#111827;
+    border:1px solid #1e293b;
+    border-radius:12px;
+    padding:20px;
+    transition:0.3s;
+}
+
+.admin-card:hover{
+    border-color:#06b6d4;
+    transform:translateY(-3px);
+}
+
+.admin-top{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.admin-avatar{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    background:#06b6d4;
+    color:black;
+    font-size:24px;
+    font-weight:bold;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.admin-name{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.admin-role{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.admin-info p{
+    margin:10px 0;
+    color:#cbd5e1;
+    word-break:break-word;
+}
+
+.admin-info span{
+    font-weight:bold;
+    color:white;
+}
+
+.admin-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:20px;
+}
+
+.reset-btn{
+    background:#22c55e;
+    color:white;
+    padding:10px;
+    border-radius:8px;
+    text-decoration:none;
+    text-align:center;
+    font-weight:bold;
+}
+
+.reset-btn:hover{
+    opacity:0.85;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+    padding:10px;
+    border-radius:8px;
+    text-decoration:none;
+    text-align:center;
+    font-weight:bold;
+}
+
+.delete-btn:hover{
+    opacity:0.85;
+}
+
+.protected{
+    background:#334155;
+    color:white;
+    text-align:center;
+    padding:10px;
+    border-radius:8px;
+    font-weight:bold;
+}
+
 </style>
 
 </head>
@@ -257,13 +362,21 @@ table td{
 
                 {% if admin.username != session.admin_name %}
 
-                <a
-                href="/delete-admin/{{ admin.id }}"
-                class="delete-btn">
+        <a href="/reset-password/{{ admin.id }}"
+           class="reset-btn"
+           onclick="return confirm('Reset password for this admin?')">
 
-                    Delete Admin
+            Reset Password
 
-                </a>
+        </a>
+
+        <a href="/delete-admin/{{ admin.id }}"
+           class="delete-btn"
+           onclick="return confirm('Delete this admin?')">
+
+            Delete Admin
+
+        </a>
 
                 {% else %}
 
